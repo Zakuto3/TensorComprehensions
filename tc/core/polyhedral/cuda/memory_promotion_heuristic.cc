@@ -263,6 +263,8 @@ isl::union_set collectMappingsTo(const Scop& scop) {
   return mapping;
 }
 
+struct Unrolled;
+
 /*
  * Check that only unrolled loops may appear in access subscripts.
  * Because the scoping point can be above a branching tree, descend into each
@@ -332,7 +334,7 @@ bool accessSubscriptsAreUnrolledLoops(
     }
 
     auto space =
-        subdomain.get_space().add_unnamed_tuple_ui(unrolledDims.size());
+        subdomain.get_space().add_unnamed_tuple_ui<Unrolled>(unrolledDims.size());
     auto unrolledDimsMupa = isl::multi_union_pw_aff(space, unrolledDims);
 
     // It is possible that no loops are unrolled, in which case
