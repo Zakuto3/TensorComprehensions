@@ -1,6 +1,7 @@
 namespace tc {
 namespace polyhedral {
 
+struct Band;
 struct Prefix;
 struct Reduction;
 struct ReductionSchedule;
