@@ -369,7 +369,7 @@ void Scop::computeAllDependences() {
 }
 
 isl::union_map Scop::activeDependences(detail::ScheduleTree* tree) {
-  auto prefix = prefixScheduleMupa(scheduleRoot(), tree);
+  auto prefix = prefixScheduleMupa<Scope>(scheduleRoot(), tree);
   auto domain = activeDomainPoints(scheduleRoot(), tree);
   auto active = dependences;
   active = active.intersect_domain(domain);
@@ -484,7 +484,7 @@ void Scop::reschedule(
   auto parentTree = tree->ancestor(root, 1);
   auto treePos = tree->positionInParent(parentTree);
   auto domain = activeDomainPoints(root, tree);
-  auto prefix = prefixScheduleMupa(root, tree);
+  auto prefix = prefixScheduleMupa<Prefix>(root, tree);
 
   // Restrict the constraints to domain points reachable from point loops
   // and update the current prefix.

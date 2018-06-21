@@ -79,9 +79,13 @@ isl::multi_union_pw_aff infixScheduleMupa(
 // function on the universe domain of the schedule tree.
 // Note that unlike isl_schedule_node_get_prefix_schedule_multi_union_pw_aff,
 // this function does not take into account any intermediate filter nodes.
-isl::multi_union_pw_aff prefixScheduleMupa(
+template <typename Schedule>
+isl::MultiUnionPwAff<Statement, Schedule> prefixScheduleMupa(
     const detail::ScheduleTree* root,
-    const detail::ScheduleTree* tree);
+    const detail::ScheduleTree* tree) {
+  auto prefix = infixScheduleMupa(root, root, tree);
+  return isl::MultiUnionPwAff<Statement, Schedule>(prefix);
+}
 
 // Return the concatenation of all outer band node partial schedules,
 // including that of the node itself.
@@ -91,7 +95,7 @@ template <typename Schedule>
 isl::MultiUnionPwAff<Statement, Schedule> partialScheduleMupa(
     const detail::ScheduleTree* root,
     const detail::ScheduleTree* tree) {
-  auto prefix = prefixScheduleMupa(root, tree);
+  isl::multi_union_pw_aff prefix = prefixScheduleMupa<Schedule>(root, tree);
   auto band = tree->as<detail::ScheduleTreeBand>();
   auto partial = band ? prefix.flat_range_product(band->mupa_) : prefix;
   return isl::MultiUnionPwAff<Statement, Schedule>(partial);
