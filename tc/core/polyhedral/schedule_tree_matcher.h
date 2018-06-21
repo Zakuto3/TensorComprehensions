@@ -34,8 +34,8 @@ isl::UnionSet<Statement> reductionUpdates(isl::union_set domain, const Scop& sco
 // In particular, do the elements of "domain" access a single tensor
 // element within "prefix"?
 bool isSingleReductionWithin(
-    isl::union_set domain,
-    isl::multi_union_pw_aff prefix,
+    isl::UnionSet<Statement> domain,
+    isl::MultiUnionPwAff<Statement, Prefix> prefix,
     const Scop& scop);
 
 } // namespace polyhedral

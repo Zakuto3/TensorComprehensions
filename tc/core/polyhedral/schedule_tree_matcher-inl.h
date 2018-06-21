@@ -291,13 +291,14 @@ inline std::vector<const detail::ScheduleTree*> match(
   return matchDFSPreorder(matcher, tree);
 }
 
+template <typename Prefix>
 inline bool isSingleReductionWithin(
-    isl::union_set domain,
-    isl::multi_union_pw_aff prefix,
+    isl::UnionSet<Statement> domain,
+    isl::MultiUnionPwAff<Statement, Prefix> prefix,
     const Scop& scop) {
   auto reductions = scop.body.reductions;
   reductions = reductions.intersect_domain(domain);
-  auto prefixMap = isl::union_map::from(prefix);
+  auto prefixMap = prefix.toUnionMap();
   auto prefixToReduction = reductions.apply_domain(prefixMap);
   return prefixToReduction.is_single_valued();
 }
