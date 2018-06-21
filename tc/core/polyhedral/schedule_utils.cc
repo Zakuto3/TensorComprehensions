@@ -73,12 +73,6 @@ isl::union_map partialScheduleImpl(
 }
 } // namespace detail
 
-isl::union_map partialSchedule(
-    const ScheduleTree* root,
-    const ScheduleTree* node) {
-  return partialScheduleImpl(root, node, true);
-}
-
 namespace {
 /*
  * If "node" is any filter, then intersect "domain" with that filter.
