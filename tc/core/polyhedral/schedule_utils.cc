@@ -49,7 +49,7 @@ isl::union_map extendSchedule(
   return schedule;
 }
 
-namespace {
+namespace detail {
 isl::union_map partialScheduleImpl(
     const ScheduleTree* root,
     const ScheduleTree* node,
@@ -71,13 +71,7 @@ isl::union_map partialScheduleImpl(
   }
   return schedule;
 }
-} // namespace
-
-isl::union_map prefixSchedule(
-    const ScheduleTree* root,
-    const ScheduleTree* node) {
-  return partialScheduleImpl(root, node, false);
-}
+} // namespace detail
 
 isl::union_map partialSchedule(
     const ScheduleTree* root,
@@ -124,7 +118,7 @@ isl::union_set collectDomain(
   for (auto anc : nodes) {
     domain = filter(domain, anc);
     if (auto extensionElem = anc->as<ScheduleTreeExtension>()) {
-      auto parentSchedule = prefixSchedule(root, anc);
+      isl::union_map parentSchedule = prefixSchedule<Prefix>(root, anc);
       auto extension = extensionElem->extension_;
       TC_CHECK(parentSchedule) << "missing root domain node";
       parentSchedule = parentSchedule.intersect_domain(domain);

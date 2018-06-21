@@ -19,6 +19,7 @@
 
 #include "tc/core/polyhedral/cuda/mapped_scop.h"
 #include "tc/core/polyhedral/cuda/mapping_types.h"
+#include "tc/core/polyhedral/domain_types.h"
 #include "tc/core/polyhedral/exceptions.h"
 #include "tc/core/polyhedral/memory_promotion.h"
 #include "tc/core/polyhedral/schedule_tree.h"
@@ -225,7 +226,7 @@ bool promotionImprovesCoalescing(
     auto depth = marker->scheduleDepth(root);
     auto activePoints = activeDomainPoints(root, mapping);
     auto localAccesses = originalAccesses.intersect_domain(activePoints);
-    auto schedule = prefixSchedule(root, marker);
+    auto schedule = prefixSchedule<Prefix>(root, marker);
     auto scheduledAccesses = localAccesses.apply_domain(schedule);
     for (auto access : scheduledAccesses.get_map_list()) {
       auto scheduleSpace = access.get_space().domain();

@@ -51,6 +51,13 @@ isl::union_map extendSchedule(
     const detail::ScheduleTree* node,
     isl::union_map schedule);
 
+namespace detail {
+isl::union_map partialScheduleImpl(
+    const ScheduleTree* root,
+    const ScheduleTree* node,
+    bool useNode);
+} // namespace detail
+
 // Get the partial schedule defined by ancestors of the given node and the node
 // itself.
 isl::union_map partialSchedule(
@@ -58,9 +65,13 @@ isl::union_map partialSchedule(
     const detail::ScheduleTree* node);
 
 // Return the schedule defined by the ancestors of the given node.
-isl::union_map prefixSchedule(
+template <typename Schedule>
+isl::UnionMap<Statement, Schedule> prefixSchedule(
     const detail::ScheduleTree* root,
-    const detail::ScheduleTree* node);
+    const detail::ScheduleTree* node) {
+  auto prefix = partialScheduleImpl(root, node, false);
+  return isl::UnionMap<Statement, Schedule>(prefix);
+}
 
 // Return the concatenation of all band node partial schedules
 // from "relativeRoot" (inclusive) to "tree" (exclusive)
