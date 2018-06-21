@@ -28,7 +28,9 @@ namespace polyhedral {
 
 // Return the union of the reduction update statements
 // that appear in "domain".
-isl::UnionSet<Statement> reductionUpdates(isl::union_set domain, const Scop& scop);
+isl::UnionSet<Statement> reductionUpdates(
+    isl::UnionSet<Statement> domain,
+    const Scop& scop);
 
 // Does "prefix" partition "domain" into individual reductions?
 // In particular, do the elements of "domain" access a single tensor
