@@ -372,23 +372,25 @@ bool accessSubscriptsAreUnrolledLoops(
  * thread associated to a given pair of tensor element and outer schedule
  * iteration.
  */
+template <typename Outer>
 bool isPromotableToRegistersBelow(
     const TensorReferenceGroup& group,
     const detail::ScheduleTree* root,
     const detail::ScheduleTree* scope,
-    isl::multi_union_pw_aff outer,
-    isl::multi_union_pw_aff thread) {
+    isl::MultiUnionPwAff<Statement, Outer> outer,
+    isl::MultiUnionPwAff<Statement, Thread> thread) {
   if (!accessSubscriptsAreUnrolledLoops(
-          group, root, scope, outer.flat_range_product(thread))) {
+          group, root, scope, outer.range_product(thread))) {
     return false;
   }
 
   auto originalAccesses = group.originalAccesses();
-  auto map = isl::union_map::from(outer);
-  map = map.range_product(originalAccesses);
-  map = map.apply_domain(isl::union_map::from(thread));
+  auto outerMap = isl::UnionMap<Statement, Outer>::from(outer);
+  auto pair = outerMap.range_product(originalAccesses);
+  auto threadMap = isl::UnionMap<Statement, Thread>::from(thread);
+  auto threadToPair = pair.apply_domain(threadMap);
 
-  return map.is_injective();
+  return threadToPair.is_injective();
 }
 
 /*
