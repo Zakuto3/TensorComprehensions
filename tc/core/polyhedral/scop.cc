@@ -97,8 +97,8 @@ isl::union_set& Scop::domainRef() {
   return dom->domain_;
 }
 
-const isl::union_set Scop::domain() const {
-  return const_cast<Scop*>(this)->domainRef();
+const isl::UnionSet<Statement> Scop::domain() const {
+  return isl::UnionSet<Statement>(const_cast<Scop*>(this)->domainRef());
 }
 
 std::ostream& operator<<(std::ostream& os, const Scop& s) {
