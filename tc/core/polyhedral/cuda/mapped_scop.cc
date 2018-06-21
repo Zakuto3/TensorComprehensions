@@ -288,7 +288,7 @@ bool MappedScop::detectReductions(ScheduleTree* tree) {
   // a single reduction for now.
   // Support for multiple reductions would require a check
   // that these reductions do not interfere with each other.
-  auto domain = isl::UnionSet<Statement>(band->mupa_.domain());
+  auto domain = band->mupa_.domain();
   auto updates = reductionUpdates(domain, scop());
   if (updates.n_set() != 1) {
     return false;
@@ -559,7 +559,7 @@ Scop::SyncLevel MappedScop::findBestSync(
   auto activePoints2 = activeDomainPointsBelow(stRoot, st2);
 
   // The dependences between the two schedule trees
-  isl::union_map dependences = scop_->dependences;
+  auto dependences = scop_->dependences;
   dependences = dependences.intersect_domain(activePoints1);
   dependences = dependences.intersect_range(activePoints2);
   if (dependences.is_empty()) {

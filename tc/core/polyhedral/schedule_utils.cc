@@ -43,7 +43,8 @@ isl::union_map extendSchedule(
     // schedule values that correspond to active domain elements at this
     // point.
     schedule = schedule.unite(
-        extensionElem->extension_.reverse().intersect_range(schedule.range()));
+        extensionElem->extension_.isl::union_map::reverse().intersect_range(
+            schedule.range()));
   }
 
   return schedule;
@@ -77,7 +78,9 @@ namespace {
 /*
  * If "node" is any filter, then intersect "domain" with that filter.
  */
-isl::union_set applyFilter(isl::union_set domain, const ScheduleTree* node) {
+isl::UnionSet<Statement> applyFilter(
+    isl::UnionSet<Statement> domain,
+    const ScheduleTree* node) {
   if (auto filterElem = node->as<ScheduleTreeFilter>()) {
     return domain.intersect(filterElem->filter_);
   }
@@ -87,7 +90,9 @@ isl::union_set applyFilter(isl::union_set domain, const ScheduleTree* node) {
 /*
  * If "node" is a mapping, then intersect "domain" with its filter.
  */
-isl::union_set applyMapping(isl::union_set domain, const ScheduleTree* node) {
+isl::UnionSet<Statement> applyMapping(
+    isl::UnionSet<Statement> domain,
+    const ScheduleTree* node) {
   if (auto filterElem = node->as<ScheduleTreeMapping>()) {
     return domain.intersect(filterElem->filter_);
   }
@@ -100,10 +105,11 @@ isl::union_set applyMapping(isl::union_set domain, const ScheduleTree* node) {
 // Domain elements are introduced by the root domain node.  Some nodes
 // refine this set of elements based on "filter".  Extension nodes
 // are considered to introduce additional domain points.
-isl::union_set collectDomain(
+isl::UnionSet<Statement> collectDomain(
     const ScheduleTree* root,
     const vector<const ScheduleTree*>& nodes,
-    isl::union_set (*filter)(isl::union_set domain, const ScheduleTree* node)) {
+    isl::UnionSet<Statement> (
+        *filter)(isl::UnionSet<Statement> domain, const ScheduleTree* node)) {
   auto domainElem = root->as<ScheduleTreeDomain>();
   TC_CHECK(domainElem) << "root must be a Domain node" << *root;
 
@@ -112,19 +118,19 @@ isl::union_set collectDomain(
   for (auto anc : nodes) {
     domain = filter(domain, anc);
     if (auto extensionElem = anc->as<ScheduleTreeExtension>()) {
-      isl::union_map parentSchedule = prefixSchedule<Prefix>(root, anc);
+      auto parentSchedule = prefixSchedule<Prefix>(root, anc);
       auto extension = extensionElem->extension_;
       TC_CHECK(parentSchedule) << "missing root domain node";
       parentSchedule = parentSchedule.intersect_domain(domain);
       domain = domain.unite(parentSchedule.range().apply(extension));
     }
   }
-  return domain;
+  return isl::UnionSet<Statement>(domain);
 }
 
 // Get the set of domain elements that are active below
 // the given branch of nodes.
-isl::union_set activeDomainPointsHelper(
+isl::UnionSet<Statement> activeDomainPointsHelper(
     const ScheduleTree* root,
     const vector<const ScheduleTree*>& nodes) {
   return collectDomain(root, nodes, &applyFilter);
@@ -141,7 +147,7 @@ isl::union_set prefixMappingFilter(
 isl::UnionSet<Statement> activeDomainPoints(
     const ScheduleTree* root,
     const ScheduleTree* node) {
-  return isl::UnionSet<Statement>(activeDomainPointsHelper(root, node->ancestors(root)));
+  return activeDomainPointsHelper(root, node->ancestors(root));
 }
 
 isl::UnionSet<Statement> activeDomainPointsBelow(
@@ -149,7 +155,7 @@ isl::UnionSet<Statement> activeDomainPointsBelow(
     const ScheduleTree* node) {
   auto ancestors = node->ancestors(root);
   ancestors.emplace_back(node);
-  return isl::UnionSet<Statement>(activeDomainPointsHelper(root, ancestors));
+  return activeDomainPointsHelper(root, ancestors);
 }
 
 vector<ScheduleTree*> collectScheduleTreesPath(

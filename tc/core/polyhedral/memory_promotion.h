@@ -137,8 +137,9 @@ class TensorReferenceGroup {
   // range spaces.
   isl::union_map originalWrites() const;
   isl::union_map originalReads() const;
-  isl::union_map originalAccesses() const {
-    return originalWrites().unite(originalReads());
+  isl::UnionMap<Statement, Tensor> originalAccesses() const {
+    auto accesses = originalWrites().unite(originalReads());
+    return isl::UnionMap<Statement, Tensor>(accesses);
   }
 
   // Rectangular overapproximation of the set of tensor elements accessed below

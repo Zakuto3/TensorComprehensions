@@ -110,10 +110,9 @@ template <typename Schedule>
 isl::MultiUnionPwAff<Statement, Schedule> partialScheduleMupa(
     const detail::ScheduleTree* root,
     const detail::ScheduleTree* tree) {
-  isl::multi_union_pw_aff prefix = prefixScheduleMupa<Schedule>(root, tree);
+  auto prefix = prefixScheduleMupa<Schedule>(root, tree);
   auto band = tree->as<detail::ScheduleTreeBand>();
-  auto partial = band ? prefix.flat_range_product(band->mupa_) : prefix;
-  return isl::MultiUnionPwAff<Statement, Schedule>(partial);
+  return band ? prefix.template flat_range_product<Schedule>(band->mupa_) : prefix;
 }
 
 // Get the set of domain points active at the given node.  A domain
