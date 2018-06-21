@@ -365,10 +365,12 @@ void Scop::computeAllDependences() {
   auto falseDeps =
       computeDependences(allWrites.unite(allReads), allWrites, schedule);
 
-  dependences = flowDeps.unite(falseDeps).coalesce();
+  dependences =
+      isl::UnionMap<Statement, Statement>(flowDeps.unite(falseDeps).coalesce());
 }
 
-isl::union_map Scop::activeDependences(detail::ScheduleTree* tree) {
+isl::UnionMap<Statement, Statement> Scop::activeDependences(
+    detail::ScheduleTree* tree) {
   auto prefix = prefixScheduleMupa<Scope>(scheduleRoot(), tree);
   auto domain = activeDomainPoints(scheduleRoot(), tree);
   auto active = dependences;
