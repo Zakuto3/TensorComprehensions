@@ -588,8 +588,8 @@ bool canOrderAfter(
 void orderBefore(
     ScheduleTree* root,
     ScheduleTree* tree,
-    isl::union_set filter) {
-  isl::union_set active = activeDomainPoints(root, tree);
+    isl::UnionSet<Statement> filter) {
+  auto active = activeDomainPoints(root, tree);
   auto other = active.subtract(filter);
   auto seq = ScheduleTree::makeSequence(
       gistedFilter(filter, ScheduleTree::makeScheduleTree(*tree)));
@@ -599,8 +599,11 @@ void orderBefore(
   parent->insertChild(childPos, std::move(seq));
 }
 
-void orderAfter(ScheduleTree* root, ScheduleTree* tree, isl::union_set filter) {
-  isl::union_set active = activeDomainPoints(root, tree);
+void orderAfter(
+    ScheduleTree* root,
+    ScheduleTree* tree,
+    isl::UnionSet<Statement> filter) {
+  auto active = activeDomainPoints(root, tree);
   auto other = active.subtract(filter);
   auto seq = ScheduleTree::makeSequence(
       gistedFilter(filter, ScheduleTree::makeScheduleTree(*tree)));
