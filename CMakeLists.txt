@@ -225,6 +225,7 @@ message(STATUS "Found ATen.so file: ${ATEN_LIBRARIES}")
 ################################################################################
 # use locally generated C++ bindings
 include_directories(AFTER ${PROJECT_SOURCE_DIR}/isl_interface/include)
+include_directories(AFTER ${CMAKE_CURRENT_BINARY_DIR}/isl_interface/include)
 include_directories(AFTER ${PROJECT_SOURCE_DIR}/third-party/islpp/include)
 include_directories(AFTER ${CMAKE_CURRENT_BINARY_DIR}/third-party/islpp/include)
 add_subdirectory(external/isl)
