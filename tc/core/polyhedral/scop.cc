@@ -51,7 +51,7 @@ ScopUPtr Scop::makeScop(
 
   halide2isl::SymbolTable sym = halide2isl::makeSymbolTable(components);
 
-  isl::space paramSpace = halide2isl::makeParamSpace(ctx, sym.params);
+  auto paramSpace = halide2isl::makeParamSpace(ctx, sym.params);
 
   ScopUPtr scop(new Scop());
   scop->halide.params = sym.params;
@@ -518,7 +518,7 @@ const Halide::OutputImageParam& Scop::findArgument(isl::id id) const {
 isl::aff Scop::makeIslAffFromStmtExpr(isl::id stmtId, const Halide::Expr& e)
     const {
   auto domain = halide.domains.at(stmtId);
-  auto aff = halide2isl::makeIslAffFromExpr(domain.paramSpace, e);
+  isl::aff aff = halide2isl::makeIslAffFromExpr(domain.paramSpace, e);
   aff = aff.unbind_params_insert_domain(domain.tuple);
   return aff;
 }
