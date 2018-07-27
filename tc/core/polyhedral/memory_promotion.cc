@@ -342,7 +342,7 @@ void addSingletonReferenceGroups(
 // TensorReferenceGroup, with each group potentially containing multiple
 // references.
 TensorGroups TensorReferenceGroup::accessedWithin(
-    isl::union_map outerSchedule,
+    isl::UnionMap<Statement, Scope> outerSchedule,
     const Body& body) {
   TensorGroups tensorGroups;
   auto domain = outerSchedule.domain();
