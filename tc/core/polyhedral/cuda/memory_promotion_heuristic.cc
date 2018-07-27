@@ -248,7 +248,7 @@ bool promotionImprovesCoalescing(
  * Returns the union of all mapping filters to "MappingType" in "scop".
  */
 template <typename MappingType>
-isl::union_set collectMappingsTo(const Scop& scop) {
+isl::UnionSet<Statement> collectMappingsTo(const Scop& scop) {
   auto root = scop.scheduleRoot();
   auto domain = scop.domain();
   auto mappingFilters =
@@ -260,7 +260,7 @@ isl::union_set collectMappingsTo(const Scop& scop) {
     auto filter = filterNode->filter_.intersect(activeDomainPoints(root, mf));
     mapping = mapping.unite(filterNode->filter_);
   }
-  return mapping;
+  return isl::UnionSet<Statement>(mapping);
 }
 
 struct Unrolled;
@@ -474,7 +474,7 @@ void promoteToSharedBelow(
     throw promotion::IncorrectScope("cannot promote below a sequence/set node");
   }
 
-  isl::union_map partialSched = partialSchedule<Scope>(root, node);
+  auto partialSched = partialSchedule<Scope>(root, node);
   auto mapping = collectMappingsTo<mapping::BlockId>(scop);
 
   auto groupMap = TensorReferenceGroup::accessedWithin(
@@ -648,7 +648,7 @@ void promoteToRegistersBelow(MappedScop& mscop, detail::ScheduleTree* scope) {
   auto blockMapping = collectMappingsTo<mapping::BlockId>(scop);
   auto mapping =
       collectMappingsTo<mapping::ThreadId>(scop).intersect(blockMapping);
-  isl::union_map schedule = partialSchedule<Scope>(scop.scheduleRoot(), scope);
+  auto schedule = partialSchedule<Scope>(scop.scheduleRoot(), scope);
   auto groupMap = TensorReferenceGroup::accessedWithin(
       schedule.intersect_domain(mapping), scop.body);
 
